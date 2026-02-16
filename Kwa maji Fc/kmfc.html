@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kwa Maji FC | The Official Site</title>
+    
+    <!-- Fonts: Montserrat (Headings) & Roboto (Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- VARIABLES --- */
+        :root {
+            --primary: #1e3a5f; /* Deep Royal Blue */
+            --secondary: #1f1f1f; /* Dark Grey/Black */
+            --accent: #cfa856; /* Metallic Gold */
+            --bg-light: #f8f9fa; 
+            --white: #ffffff;
+            --text-main: #222222;
+            --text-muted: #777777;
+            
+            /* RM Style Gold */
+            --rm-gold: #feb510;
+            --rm-border: #e5e5e5;
+            
+            /* Modern UI Radius & Shadows */
+            --radius-lg: 24px;
+            --radius-md: 12px;
+            --shadow-card: 0 10px 40px -10px rgba(0,0,0,0.1); 
+            --shadow-hover: 0 20px 50px -10px rgba(30, 58, 95, 0.2);
+        }
+
+        /* --- RESET & BASE --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--white);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        ul { list-style: none; }
+        img { width: 100%; display: block; object-fit: cover; }
+
+        h1, h2, h3, h4 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+
+        /* --- UTILITIES --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .text-center { text-align: center; }
+        .text-gold { color: var(--accent); }
+        
+        .section-padding { padding: 100px 0; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 32px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            border-radius: 50px; 
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+            box-shadow: 0 5px 15px rgba(30, 58, 95, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            background-color: var(--secondary);
+            box-shadow: 0 8px 20px rgba(30, 58, 95, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--secondary);
+            color: var(--secondary);
+        }
+
+        .btn-outline:hover {
+            background: var(--secondary);
+            color: var(--white);
+        }
+
+        /* --- HEADER --- */
+        header {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            backdrop-filter: blur(15px);
+            z-index: 1000;
+            padding: 15px 0;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+            transition: padding 0.3s;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            color: var(--primary);
+            font-weight: 900;
+            letter-spacing: -1px;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            display: flex;
+            align-items: center;
+        }
+        .logo img {
+            height: 60px;
+            width: 60px;
+        }
+
+        .nav-links { display: flex; gap: 30px; }
+        
+        .nav-links a {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--secondary);
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px; left: 0;
+            width: 0; height: 2px;
+            background: var(--accent);
+            transition: width 0.3s;
+        }
+        .nav-links a:hover::after { width: 100%; }
+
+        .hamburger { display: none; font-size: 1.5rem; cursor: pointer; }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            height: 90vh;
+            background-color: var(--secondary);
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            margin-top: 60px;
+        }
+
+        .hero-bg {
+            position: absolute;
+            cursor: pointer;
+            top: 0; right: 0;
+            width: 55%;
+            height: 100%;
+            background-color: #1e3a5f;
+            clip-path: polygon(20% 0, 100% 0, 100% 100%, 0% 100%);
+            z-index: 1;
+        }
+        
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 45%; height: 100%;
+            background: linear-gradient(to right, var(--secondary) 0%, transparent 100%);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            color: var(--white);
+            max-width: 600px;
+            padding-left: 20px;
+            padding-top: 50px;
+        }
+
+        .hero-title {
+            font-size: 4.5rem;
+            margin-bottom: 20px;
+            line-height: 0.95;
+            color:#cfa856 ;
+        }
+        
+        .hero-desc {
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+            color: rgba(255,255,255,0.8);
+            cursor: pointer;
+            font-family: georgian;
+        }
+
+        /* --- SQUAD SECTION --- */
+        .squad-section { background: #c9a353; }
+
+        .section-header { margin-bottom: 50px; text-align: center; }
+        .section-header h2 { font-size: 2.5rem; color: #1e3a5f; margin-bottom: 10px; }
+        .section-header p { color: #1e3a5f;  font-family: Georgia, 'Times New Roman', Times, serif;cursor: pointer; }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        .clickable-name {
+        cursor: pointer;
+        color: var(--secondary); /* Keep the dark color */
+        text-decoration: underline;
+        text-decoration-color: transparent; /* Hide underline by default */
+        text-decoration-thickness: 2px;
+        transition: color 0.2s, text-decoration-color 0.2s;
+    }
+
+    .clickable-name:hover {
+        color: var(--primary); /* Change to blue on hover */
+        text-decoration-color: var(--primary); /* Show underline on hover */
+    }
+
+
+        /* Card Styling */
+        .player-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            cursor: pointer;
+        }
+
+        .player-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .card-image-wrapper {
+            height: 320px;
+            width: 100%;
+            overflow: hidden;
+            background: #f0f0f0;
+            position: relative;
+        }
+
+        .card-image-wrapper img {
+            height: auto;
+            width: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .player-card:hover .card-image-wrapper img {
+            transform: scale(1.05);
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 20px; left: 20px;
+            background: #1e3a5f;
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 0.9rem;
+            color:  #a58b56;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .card-info {
+            padding: 25px;
+            text-align: center;
+            background: var(--white);
+        }
+
+        .player-name {
+            font-size: 1.3rem;
+            color: var(--secondary);
+            margin-bottom: 5px;
+        }
+
+        .player-role {
+            font-size: 0.85rem;
+            color: #bb8717;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-overlay {
+            position: absolute;
+            bottom: 0; left: 0; width: 100%;
+            background: var(--primary);
+            padding: 20px 25px;
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .player-card:hover .card-overlay { transform: translateY(0); }
+
+        .mini-stat {
+            text-align: center;
+            color: var(--white);
+        }
+        .mini-stat span { display: block; font-weight: 700; font-size: 1.2rem; }
+        .mini-stat small { font-size: 0.7rem; opacity: 0.8; text-transform: uppercase; }
+
+        /* --- MODAL (Player Profile) --- */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal.active { opacity: 1; pointer-events: auto; }
+
+        .modal-card {
+            background: var(--white);
+            width: 900px;
+            max-width: 95%;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            display: flex;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            transform: scale(0.9);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            flex-direction: row;
+        }
+
+        .modal.active .modal-card { transform: scale(1); }
+
+        .modal-left {
+            width: 45%;
+            background: var(--secondary);
+            position: relative;
+            display: flex; 
+            flex-direction: column; 
+        }
+
+        .modal-img { height: 100%; object-fit: cover; opacity: 0.9; width: 100%; }
+        
+        .modal-number {     
+        position: absolute;
+        bottom: -0px;
+        right: 21px;
+        font-size: 2rem;
+        font-weight: 900;
+        color: rgb(153 124 63);
+        line-height: 1;
+        z-index: 2;
+        }
+
+        .modal-right {
+            width: 55%;
+            padding: 0; 
+            position: relative;
+            background: var(--white);
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh; 
+            overflow-y: auto; 
+        }
+
+        .modal-content-wrapper {
+            padding: 50px;
+            padding-bottom: 0;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 0px;
+            height: 40px;
+            border-radius: 50%;
+            background: #b38524;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            z-index: 10;
+}
+.close-btn:hover { background: #e0e0e0; }
+
+        .modal-meta {
+            color: var(--accent);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+            cursor: pointer;
+        }
+
+        .modal-title {
+            font-size: 2.5rem;
+            color: var(--secondary);
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        /* --- REAL MADRID STYLE STATS UI --- */
+        
+        /* 1. The Big Stats (Individual Player) */
+        .rm-stats-hero {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid var(--rm-border);
+        }
+
+        .rm-stat-box {
+            text-align: center;
+            flex: 1;
+            position: relative;
+        }
+        
+        /* Add vertical dividers */
+        .rm-stat-box:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 10%;
+            height: 80%;
+            width: 1px;
+            background-color: var(--rm-border);
+        }
+
+        .rm-stat-value {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 3.5rem;
+            line-height: 1;
+            color: var(--text-main);
+            display: block;
+        }
+
+        .rm-stat-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+            display: block;
+        }
+
+        /* 2. The Clean Table (Global Leaderboard) */
+        .rm-stats-table-container {
+            margin-top: 20px;
+        }
+
+        .rm-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .rm-table th {
+            text-align: left;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #999;
+            text-transform: uppercase;
+            padding: 15px 10px;
+            border-bottom: 2px solid var(--rm-border);
+        }
+
+        .rm-table td {
+            padding: 20px 10px;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            border-bottom: 1px solid #f0f0f0;
+            font-weight: 500;
+        }
+
+        .rm-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .rm-table .rank-col {
+            width: 50px;
+            color: #999;
+            font-weight: 700;
+        }
+
+        .rm-table .name-col {
+            font-weight: 700;
+            color: var(--secondary);
+        }
+
+        .rm-table .stat-col {
+            text-align: right;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* --- ANIMATION --- */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+        /* --- FOOTER --- */
+        footer {
+            background: var(--secondary);
+            color: var(--white);
+            padding: 80px 0 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 1.5fr;
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .footer-col h4 { color: var(--white); margin-bottom: 25px; font-size: 1.1rem; }
+        .footer-col p, .footer-col a { color: #999; font-size: 0.9rem; margin-bottom: 12px; display: block; }
+        .footer-col a:hover { color: var(--accent); padding-left: 5px; }
+
+        .socials a {
+            display: inline-block;
+            width: 35px; height: 35px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            margin-right: 10px;
+            color: var(--white);
+            transition: 0.3s;
+        }
+        .socials a:hover { background: var(--accent); color: var(--secondary); }
+
+        .copyright {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 20px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 900px) {
+            .hero-bg { width: 100%; clip-path: none; opacity: 0.3; }
+            .hero::after { display: none; }
+            .hero-content { padding: 20px; width: 100%; text-align: center; }
+            .hero-title { font-size: 3rem; }
+            
+            .modal-card { flex-direction: column; height: 90vh; overflow-y: auto; }
+            .modal-left, .modal-right { width: 100%; }
+            .modal-left { height: 300px; }
+            .modal-content-wrapper { padding: 30px; }
+            
+            /* Adjust Stats for Mobile */
+            .rm-stats-hero {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .rm-stat-box:not(:last-child)::after {
+                display: none; /* Remove dividers on mobile */
+            }
+            .rm-stat-value { font-size: 2.5rem; }
+
+            .nav-links { display: none; } 
+            .hamburger { display: block; }
+            
+            .footer-content { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container nav-container">
+            <!-- logo -->
+            <div class="logo"><img src="logo1.png" alt="">KWA<span class="text-gold">MAJI</span> FC</div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#squad">The Squad</a></li>
+                    <li><a href="#" onclick="openLeaderboard()">stats</a></li>
+                </ul>
+            </nav>
+            <div class="hamburger"><i class="fas fa-bars"></i></div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg" ></div>
+        <div class="container">
+            <div class="hero-content fade-up">
+                <h1 class="hero-title">a team of very good friends and brothers</h1>
+                <p class="hero-desc">Join the club that plays with the heart of a soldier through all setbacks and challanges.</p>
+                <a href="#" onclick="openLeaderboard()" class="btn btn-primary"> all-time seasonal stats <i class="fas fa-arrow-right" style="margin-left: 8px;"></i></a>
+                <button class="btn btn-outline" style="border-color: rgba(255,255,255,0.3); color: white; margin-left: 10px;">Highlights and moments</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Squad Section -->
+    <section class="section-padding squad-section" id="squad">
+        <div class="container">
+            <div class="section-header fade-up">
+                <h2>The Squad</h2>
+                <p>The elite warriors representing Kwa Maji </p>
+            </div>
+
+            <div class="grid-container" id="squad-grid">
+                <!-- Players injected via JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Player Modal -->
+    <div class="modal" id="player-modal">
+        <div class="modal-card">
+            <div class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></div>
+            
+            <div class="modal-left">
+                <img src="full.jpg" class="modal-img" id="m-img" alt="Player">
+                <div class="modal-number" id="m-num">FC</div>
+            </div>
+            
+            <div class="modal-right">
+                <div class="modal-content-wrapper">
+                    <div class="modal-meta">
+                        <span id="m-pos">LB/RB/CM/CAM</span> • <span id="m-age">20 Years</span> • <span id="m-country">KENYA</span>
+                    </div>
+                    <h2 class="modal-title" id="m-name">Player Name</h2>
+                    <p style="color: #555;margin-bottom: 30px;font-family: georgia;" id="m-bio">The captain and creative engine of the team.</p>
+
+                    <!-- CONTAINER FOR DYNAMIC STATS (RM STYLE) -->
+                    <div id="rm-stats-container">
+                        <!-- Content injected via JS -->
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-col">
+                    <div class="logo" style="margin-bottom: 20px;">KWA<span class="text-gold">MAJI</span></div>
+                    <p>The official home of Kwa Maji FC. We are more than a club, we are a legacy.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Club</h4>
+                    <a href="#">About Us</a>
+                   
+                </div>
+                <div class="footer-col">
+                    <h4>Community</h4>
+                    
+                </div>
+                <div class="footer-col">
+                    <h4>Follow Us</h4>
+                    
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 2026 Kwa Maji FC. Developed by attached_._
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- DATA (UPDATED WITH PDF STATS) ---
+        const players = [
+            { id: 1, name: "WALTER", number: "7", pos: "CDM/CAM/ST", age: 23, country: "KENYA", matches: 28, goals: 32, assists: 8, rating: "9.5", img: "walter.jpg", bio: "Top scorer and key player." },
+            { id: 2, name: "IAN D3NJO", number: "10", pos: "CAM/ST", age: 22, country: "KENYA", matches: 22, goals: 24, assists: 24, rating: "9.2", img: "denjo.jpg", bio: "Playmaker extraordinaire with incredible vision." },
+            { id: 3, name: "MIFI", number: "22", pos: "RB/LB", age: 23, country: "KENYA", matches: 27, goals: 16, assists: 13, rating: "8.8", img: "https://picsum.photos/seed/p6/400/600", bio: "Solid defender who contributes offensively." },
+            { id: 4, name: "KASEE MKUU", number: "14", pos: "ST", age: 26, country: "KENYA", matches: 29, goals: 10, assists: 8, rating: "8.3", img: "mkuu.jpg", bio: "Experienced striker." },
+            { id: 5, name: "ANODE", number: "4", pos: "LB/CM", age: 19, country: "KENYA", matches: 25, goals: 11, assists: 9, rating: "8.6", img: "https://picsum.photos/seed/p2/400/600", bio: "Versatile player with great potential." },
+            { id: 6, name: "ALEX MAGUIRE", number: "10", pos: "CDM/CAM", age: 20, country: "KENYA", matches: 28, goals: 14, assists: 10, rating: "8.9", img: "maguire.jpg", bio: "The team leader and captain. Engine of the team." },
+            { id: 7, name: "CHEI ALEX", number: "19", pos: "CB/GK/CM", age: 23, country: "KENYA", matches: 29, goals: 6, assists: 4, rating: "8.1", img: "chei.jpg", bio: "Tough tackling leader." },
+            { id: 8, name: "SKAPPER", number: "8", pos: "RW/LW", age: 21, country: "KENYA", matches: 20, goals: 4, assists: 3, rating: "7.9", img: "https://picsum.photos/seed/skapper/400/600", bio: "Pacy winger." }, // Added Missing Player
+            { id: 9, name: "ALBA", number: "23", pos: "CDM/CB", age: 23, country: "KENYA", matches: 24, goals: 4, assists: 3, rating: "8.3", img: "alba.jpg", bio: "Modern attacking full back." },
+            { id: 10, name: "K3NYUA", number: "11", pos: "ST/LW", age: 24, country: "KENYA", matches: 30, goals: 4, assists: 3, rating: "8.5", img: "kang.jpg", bio: "Solid striker." },
+            { id: 11, name: "MUSA", number: "5", pos: "ST/LW", age: 28, country: "KENYA", matches: 29, goals: 7, assists: 1, rating: "8.1", img: "https://picsum.photos/seed/p8/400/600", bio: "Veteran presence." },  
+            { id: 12, name: "VICKY", number: "16", pos: "CDM/CM", age: 28, country: "KENYA", matches: 29, goals: 5, assists: 1, rating: "8.1", img: "https://picsum.photos/seed/p8/400/600", bio: "Midfield dynamo." },
+            { id: 13, name: "SHAWN", number: "2", pos: "CB/ST", age: 28, country: "KENYA", matches: 29, goals: 3, assists: 3, rating: "8.1", img: "https://picsum.photos/seed/p8/400/600", bio: "Reliable defender." },
+            { id: 14, name: "PAPI CHULO", number: "17", pos: "CDM/CB", age: 24, country: "KENYA", matches: 29, goals: 2, assists: 2, rating: "8.1", img: "chulo.jpg", bio: "Very solid defensively." },
+            { id: 15, name: "JACK", number: "18", pos: "DM/CM", age: 26, country: "KENYA", matches: 29, goals: 1, assists: 1, rating: "8.1", img: "", bio: "Squad player." },
+            { id: 16, name: "CHRIS", number: "15", pos: "CB/CDM", age: 28, country: "KENYA", matches: 29, goals: 1, assists: 1, rating: "8.1", img: "chris.jpg", bio: "Strong and pacy." },
+            { id: 17, name: "CASEMIRO", number: "6", pos: "DM/CM", age: 21, country: "KENYA", matches: 5, goals: 2, assists: 1, rating: "8.1", img: "https://picsum.photos/seed/p8/400/600", bio: "Rising talent." },
+        ];
+    
+        // --- RENDER GRID ---
+        const grid = document.getElementById('squad-grid');
+        
+        players.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'player-card fade-up';
+            card.innerHTML = `
+                <div class="card-image-wrapper">
+                    <img src="${p.img}" alt="${p.name}">
+                    <div class="card-badge">${p.number}</div>
+                </div>
+                <div class="card-info">
+                    <h3 class="player-name">${p.name}</h3>
+                    <div class="player-role">${p.pos}</div>
+                </div>
+                <div class="card-overlay">
+                    <div class="mini-stat"><span>${p.goals}</span><small>Goals</small></div>
+                    <div class="mini-stat"><span>${p.assists}</span><small>Assists</small></div>
+                    <div class="mini-stat"><span>${p.rating}</span><small>RTG</small></div>
+                </div>
+            `;
+            card.onclick = () => openModal(p);
+            grid.appendChild(card);
+        });
+    
+        // --- MODAL LOGIC ---
+        const modal = document.getElementById('player-modal');
+        const statsContainer = document.getElementById('rm-stats-container');
+        
+        function openModal(p) {
+            document.getElementById('m-img').src = p.img;
+            document.getElementById('m-num').innerText = p.number;
+            document.getElementById('m-pos').innerText = p.pos;
+            document.getElementById('m-age').innerText = p.age + " Years";
+            document.getElementById('m-country').innerText = p.country;
+            document.getElementById('m-name').innerText = p.name;
+            document.getElementById('m-bio').innerText = p.bio;
+            
+            // Render Individual RM Style Stats
+            renderIndividualStats(p);
+    
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    
+        function closeModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    
+        modal.onclick = (e) => {
+            if(e.target === modal) closeModal();
+        };
+    
+        // --- NEW HELPER FUNCTION FOR LEADERBOARD CLICK ---
+        function openModalById(id) {
+            const player = players.find(p => p.id === id);
+            if(player) {
+                openModal(player);
+            }
+        }
+    
+        // --- LEADERBOARD FUNCTION ---
+        function openLeaderboard() {
+            document.getElementById('m-img').src = "logo1.png";
+            document.getElementById('m-num').innerText = "FC";
+            document.getElementById('m-pos').innerText = "CLUB STATS";
+            document.getElementById('m-age').innerText = "All Time";
+            document.getElementById('m-country').innerText = "KENYA";
+            document.getElementById('m-name').innerText = "KWA MAJI FC";
+            document.getElementById('m-bio').innerText = "Official all-time seasonal statistics for the entire squad.";
+    
+            // Render Team RM Style Table
+            renderTeamStats();
+    
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    
+        // 1. Render Individual Stats
+        function renderIndividualStats(p) {
+            const ga = p.goals + p.assists;
+            statsContainer.innerHTML = `
+                <h4 style="font-size: 0.9rem; margin-bottom: 20px; color: #222; font-weight: 700; text-transform: uppercase;">Season Statistics</h4>
+                
+                <div class="rm-stats-hero">
+                    <div class="rm-stat-box">
+                        <span class="rm-stat-value">${p.matches}</span>
+                        <span class="rm-stat-label">Matches</span>
+                    </div>
+                    <div class="rm-stat-box">
+                        <span class="rm-stat-value" style="color: var(--primary);">${p.goals}</span>
+                        <span class="rm-stat-label">Goals</span>
+                    </div>
+                    <div class="rm-stat-box">
+                        <span class="rm-stat-value" style="color: var(--accent);">${p.assists}</span>
+                        <span class="rm-stat-label">Assists</span>
+                    </div>
+                </div>
+    
+                <div class="rm-stats-table-container">
+                     <table class="rm-table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th style="text-align: right;">Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Goals + Assists</td>
+                                <td class="stat-col">${ga}</td>
+                            </tr>
+                            <tr>
+                                <td>Average Rating</td>
+                                <td class="stat-col">${p.rating}</td>
+                            </tr>
+                            <tr>
+                                <td>Position</td>
+                                <td class="stat-col">${p.pos}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+    
+        // 2. Render Team Stats (UPDATED WITH CLICKABLE NAMES)
+        function renderTeamStats() {
+            const sortedPlayers = [...players].sort((a, b) => (b.goals + b.assists) - (a.goals + a.assists));
+            
+            let rows = '';
+            sortedPlayers.forEach((p, index) => {
+                const rank = index + 1;
+                const ga = p.goals + p.assists;
+                
+                // Wrapped the name in a span with the clickable-name class and onclick handler
+                rows += `
+                    <tr>
+                        <td class="rank-col">${rank}</td>
+                        <td class="name-col">
+                            <span class="clickable-name" onclick="openModalById(${p.id})">
+                                ${p.name}
+                            </span>
+                        </td>
+                        <td class="stat-col">${p.goals}</td>
+                        <td class="stat-col">${p.assists}</td>
+                        <td class="stat-col" style="color: var(--accent);">${ga}</td>
+                    </tr>
+                `;
+            });
+    
+            statsContainer.innerHTML = `
+                <div class="rm-stats-table-container">
+                    <h4 style="font-size: 0.9rem; margin-bottom: 20px; color: #222; font-weight: 700; text-transform: uppercase;">Team Leaderboard</h4>
+                    <table class="rm-table">
+                        <thead>
+                            <tr>
+                                <th class="rank-col">#</th>
+                                <th class="name-col">Player</th>
+                                <th class="stat-col">Goals</th>
+                                <th class="stat-col">Assists</th>
+                                <th class="stat-col">G+A</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+    
+        // --- SCROLL ANIMATION (Observer) ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+    
+        document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+    
+    </script>
+</body>
+</html>

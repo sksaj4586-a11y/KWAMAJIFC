@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallerykmfc </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles1.css">
+</head>
+<body>
+
+    <!-- LOADING SPINNER -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p id="loadingText" style="font-weight:600; color:var(--primary-blue);">Saving Media...</p>
+    </div>
+
+    <header>
+        <div class="logo">
+            <img src="logo1.png" alt="Logo" class="logo-img">
+            
+            <!-- <img src="logo1.png" alt="Logo" class="logo-img" onerror="this.style.display='none'"> -->
+            <span>kwamajifc galleria</span>
+        </div>
+        <div class="header-stats">
+            <div><span id="item-count">0</span> Items</div>
+            <button class="clear-btn" onclick="clearDatabase()">Reset Data</button>
+        </div>
+    </header>
+
+    <div class="controls">
+        <div class="view-toggles">
+            <button class="view-btn active" id="btnGrid" onclick="switchView('grid')">
+                <i class="fas fa-th-large"></i> Grid
+            </button>
+            <button class="view-btn" id="btnReel" onclick="switchView('reel')">
+                <i class="fas fa-film"></i> kwa maji reels
+            </button>
+        </div>
+
+        <div class="filter-bar" id="filterBar">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="image">Pics</button>
+            <button class="filter-btn" data-filter="video">Vids</button>
+        </div>
+
+        <div class="upload-container">
+            <!-- Standard Drag & Drop -->
+            <div class="upload-zone" id="dropZone">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h3>Drag & Drop files</h3>
+                <p>or <span>browse</span> to upload</p>
+                <input type="file" id="fileInput" class="btn-upload" multiple accept="image/*, video/*">
+            </div>
+            
+            <!-- Folder Picker -->
+            <div class="folder-zone" id="folderZone">
+                <i class="fas fa-folder-open"></i>
+                <h3>Load 'clips' Folder</h3>
+                <p>Import existing local folder</p>
+                <input type="file" id="folderInput" class="btn-upload" webkitdirectory directory multiple>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW 1: GRID -->
+    <div class="gallery-grid active" id="galleryGrid">
+        <!-- Content injected by JS -->
+    </div>
+
+    <!-- VIEW 2: REELS -->
+    <div class="reel-wrapper" id="reelWrapper">
+        <button class="close-reels-btn" onclick="switchView('grid')">Exit Reels</button>
+        <div class="reel-container" id="reelContainer">
+            <!-- Content injected by JS -->
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal" id="modal">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <div class="modal-content" id="modalMediaContainer"></div>
+    </div>
+    
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="toast">
+        <i class="fas fa-info-circle"></i>
+        <span id="toast-msg">Action completed</span>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. INDEXED DB SETUP (Persistent Storage)
+        // ==========================================
+        const DB_NAME = 'KwamajiGalleryDB';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'media_assets';
+        
+        let db;
+
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+                request.onerror = (event) => {
+                    console.error("Database error: " + event.target.errorCode);
+                    reject(event.target.error);
+                };
+
+                request.onsuccess = (event) => {
+                    db = event.target.result;
+                    resolve(db);
+                };
+
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        const objectStore = db.createObjectStore(STORE_NAME, { keyPath: "id", autoIncrement: true });
+                        objectStore.createIndex("type", "type", { unique: false });
+                    }
+                };
+            });
+        }
+
+        // Save a file (blob) to DB
+        function saveMediaToDB(file) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], "readwrite");
+                const objectStore = transaction.objectStore(STORE_NAME);
+                
+                const mediaItem = {
+                    name: file.name,
+                    type: file.type.startsWith('image') ? 'image' : 'video',
+                    blob: file,
+                    date: new Date()
+                };
+
+                const request = objectStore.add(mediaItem);
+
+                request.onsuccess = (event) => {
+                    resolve(event.target.result); // Returns the ID
+                };
+
+                request.onerror = (event) => {
+                    console.error("Error saving to DB:", event.target.error);
+                    // If duplicate name (key constraint logic), we could update, but add works for IDs
+                    reject(event.target.error);
+                };
+            });
+        }
+
+        // Get all media from DB
+        function getAllMediaFromDB() {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], "readonly");
+                const objectStore = transaction.objectStore(STORE_NAME);
+                const request = objectStore.getAll();
+
+                request.onsuccess = () => {
+                    resolve(request.result);
+                };
+
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
+            });
+        }
+
+        function clearDatabase() {
+            if(confirm("Are you sure you want to delete all saved media? This cannot be undone.")) {
+                const transaction = db.transaction([STORE_NAME], "readwrite");
+                const objectStore = transaction.objectStore(STORE_NAME);
+                const request = objectStore.clear();
+
+                request.onsuccess = () => {
+                    mediaData = []; // Clear memory array
+                    refreshUI();
+                    showToast("Database cleared successfully");
+                };
+            }
+        }
+
+        // ==========================================
+        // 2. APP LOGIC
+        // ==========================================
+        
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const folderZone = document.getElementById('folderZone');
+        const folderInput = document.getElementById('folderInput');
+        
+        const galleryGrid = document.getElementById('galleryGrid');
+        const reelWrapper = document.getElementById('reelWrapper');
+        const reelContainer = document.getElementById('reelContainer');
+        const filterBar = document.getElementById('filterBar');
+        const itemCountEl = document.getElementById('item-count');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingText = document.getElementById('loadingText');
+
+        let mediaData = []; // Stores metadata + ObjectURLs
+        let currentFilter = 'all';
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await initDB();
+                await loadMediaFromDB();
+            } catch (err) {
+                console.error("Failed to init DB", err);
+                showToast("Error loading database");
+            }
+        });
+
+        async function loadMediaFromDB() {
+            loadingOverlay.classList.add('active');
+            loadingText.innerText = "Loading Library...";
+            
+            try {
+                const dbItems = await getAllMediaFromDB();
+                // Convert DB Blobs to Object URLs for rendering
+                mediaData = dbItems.map(item => ({
+                    id: item.id,
+                    src: URL.createObjectURL(item.blob), // Create blob URL
+                    type: item.type,
+                    name: item.name
+                }));
+                refreshUI();
+            } catch (err) {
+                console.error(err);
+            } finally {
+                loadingOverlay.classList.remove('active');
+            }
+        }
+
+        // --- UPLOAD HANDLERS ---
+        
+        // Drag & Drop
+        dropZone.addEventListener('click', () => fileInput.click());
+        ['dragenter', 'dragover'].forEach(e => dropZone.addEventListener(e, () => dropZone.style.borderColor = 'var(--accent-gold)'));
+        ['dragleave', 'drop'].forEach(e => dropZone.addEventListener(e, () => dropZone.style.borderColor = 'var(--primary-blue)'));
+        dropZone.addEventListener('drop', handleDrop);
+        fileInput.addEventListener('change', (e) => processFiles(e.target.files));
+
+        // Folder Picker
+        folderZone.addEventListener('click', () => folderInput.click());
+        folderInput.addEventListener('change', (e) => processFiles(e.target.files));
+
+        function handleDrop(e) { 
+            e.preventDefault();
+            processFiles(e.dataTransfer.files); 
+        }
+
+        async function processFiles(files) {
+            if (!files.length) return;
+
+            loadingOverlay.classList.add('active');
+            loadingText.innerText = `Importing ${files.length} items...`;
+
+            let processedCount = 0;
+
+            for (const file of files) {
+                if (file.type.match('image.*') || file.type.match('video.*')) {
+                    try {
+                        // 1. Save to IndexedDB
+                        const id = await saveMediaToDB(file);
+                        
+                        // 2. Add to memory
+                        mediaData.push({
+                            id: id,
+                            src: URL.createObjectURL(file),
+                            type: file.type.startsWith('image') ? 'image' : 'video',
+                            name: file.name
+                        });
+                        
+                        processedCount++;
+                    } catch (err) {
+                        console.warn("Failed to save (maybe duplicate?):", file.name);
+                    }
+                }
+            }
+
+            loadingOverlay.classList.remove('active');
+            refreshUI();
+            showToast(`Successfully imported ${processedCount} files.`);
+        }
+
+        // --- VIEW SWITCHING ---
+        function switchView(view) {
+            const btnGrid = document.getElementById('btnGrid');
+            const btnReel = document.getElementById('btnReel');
+
+            if (view === 'grid') {
+                btnGrid.classList.add('active');
+                btnReel.classList.remove('active');
+                galleryGrid.classList.add('active');
+                reelWrapper.classList.remove('active');
+                filterBar.style.opacity = '1';
+                document.body.style.overflow = 'auto';
+                const reelVids = document.querySelectorAll('.reel-video');
+                reelVids.forEach(v => v.pause());
+            } else {
+                btnReel.classList.add('active');
+                btnGrid.classList.remove('active');
+                galleryGrid.classList.remove('active');
+                reelWrapper.classList.add('active');
+                filterBar.style.opacity = '0.5';
+                document.body.style.overflow = 'hidden';
+                renderReels();
+            }
+        }
+
+        // --- GRID RENDERING ---
+        function renderGrid() {
+            galleryGrid.innerHTML = '';
+            const filtered = mediaData.filter(item => currentFilter === 'all' || item.type === currentFilter);
+
+            if (filtered.length === 0) {
+                galleryGrid.innerHTML = `<div style="text-align:center; padding:50px; color:#888; grid-column:1/-1;">
+                    <i class="fas fa-folder-open" style="font-size:3rem; margin-bottom:15px;"></i>
+                    <p>No media found.</p>
+                </div>`;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'gallery-item';
+                
+                let content = '';
+                if (item.type === 'image') {
+                    content = `<img src="${item.src}" loading="lazy">`;
+                } else {
+                    content = `
+                        <video src="${item.src}" muted preload="metadata"></video>
+                        <div class="video-indicator"><i class="fas fa-play"></i></div>
+                    `;
+                }
+                
+                el.innerHTML = content;
+                el.onclick = () => openModal(item);
+                galleryGrid.appendChild(el);
+            });
+        }
+
+        // --- REEL RENDERING ---
+        function renderReels() {
+            const videos = mediaData.filter(item => item.type === 'video');
+            
+            if (videos.length === 0) {
+                reelContainer.innerHTML = `
+                    <div class="reel-item">
+                        <div style="text-align:center; color:white;">
+                            <i class="fas fa-video-slash" style="font-size:3rem; margin-bottom:20px; opacity:0.5;"></i>
+                            <p>No Videos Found</p>
+                            <p style="font-size:0.8rem; opacity:0.7;">Upload or load a folder to get started.</p>
+                        </div>
+                    </div>`;
+                return;
+            }
+
+            reelContainer.innerHTML = '';
+            videos.forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'reel-item';
+                el.innerHTML = `
+                    <video class="reel-video" src="${item.src}"  loop playsinline></video>
+                    <div class="reel-ui">
+                        <div class="reel-info">
+                            <h3>${item.name}</h3>
+                            <p>@KwamajiFC • Local Library</p>
+                        </div>
+                        <div class="reel-actions">
+                            <button class="action-btn" onclick="toggleLike(this)">
+                                <i class="fas fa-heart"></i>
+                                <span class="action-label">Like</span>
+                            </button>
+                            <button class="action-btn" onclick="showToast('Comment feature coming soon!')">
+                                <i class="fas fa-comment-dots"></i>
+                                <span class="action-label">Comment</span>
+                            </button>
+                            <button class="action-btn" onclick="showToast('Link copied to clipboard!')">
+                                <i class="fas fa-share"></i>
+                                <span class="action-label">Share</span>
+                            </button>
+                            <button class="action-btn" onclick="toggleMute(this)">
+                                <i class="fas fa-volume-mute"></i>
+                                <span class="action-label">Mute</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                reelContainer.appendChild(el);
+            });
+
+            setupIntersectionObserver();
+        }
+
+        // --- AUTO-PLAY LOGIC ---
+        function setupIntersectionObserver() {
+            const options = {
+                root: reelContainer,
+                threshold: 0.6 
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const video = entry.target.querySelector('video');
+                    if (entry.isIntersecting) {
+                        video.currentTime = 0;
+                        video.play().catch(e => console.log("Autoplay blocked until interaction"));
+                    } else {
+                        video.pause();
+                    }
+                });
+            }, options);
+
+            document.querySelectorAll('.reel-item').forEach(item => {
+                observer.observe(item);
+            });
+        }
+
+        // --- INTERACTIONS ---
+        function toggleMute(btn) {
+            const item = btn.closest('.reel-item');
+            const video = item.querySelector('video');
+            const icon = btn.querySelector('i');
+
+            if (video.muted) {
+                video.muted = false;
+                icon.className = 'fas fa-volume-up';
+                btn.querySelector('.action-label').innerText = 'Sound';
+            } else {
+                video.muted = true;
+                icon.className = 'fas fa-volume-mute';
+                btn.querySelector('.action-label').innerText = 'Mute';
+            }
+        }
+
+        function toggleLike(btn) {
+            const icon = btn.querySelector('i');
+            if (icon.style.color === 'var(--accent-gold)') {
+                icon.style.color = 'white';
+            } else {
+                icon.style.color = 'var(--accent-gold)';
+                icon.style.transform = 'scale(1.2)';
+                setTimeout(() => icon.style.transform = 'scale(1)', 200);
+                showToast('Added to likes');
+            }
+        }
+        
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const msgSpan = document.getElementById('toast-msg');
+            msgSpan.innerText = message;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 2000);
+        }
+
+        // --- FILTER ---
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                renderGrid();
+            });
+        });
+
+        // --- MODAL ---
+        const modal = document.getElementById('modal');
+        const modalContent = document.getElementById('modalMediaContainer');
+
+        function openModal(item) {
+            modalContent.innerHTML = '';
+            if (item.type === 'image') {
+                modalContent.innerHTML = `<img src="${item.src}">`;
+            } else {
+                modalContent.innerHTML = `<video src="${item.src}" controls autoplay></video>`;
+            }
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            modalContent.innerHTML = '';
+        }
+
+        modal.addEventListener('click', (e) => { if(e.target === modal) closeModal(); });
+
+        // --- REFRESH UI ---
+        function refreshUI() {
+            itemCountEl.innerText = mediaData.length;
+            renderGrid();
+            if (reelWrapper.classList.contains('active')) {
+                renderReels();
+            }
+        }
+
+    </script>
+</body>
+</html>
